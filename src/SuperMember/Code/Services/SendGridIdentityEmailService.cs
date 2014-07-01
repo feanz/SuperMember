@@ -3,10 +3,11 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using SendGrid;
+using SuperMember.Sample.Code.Interfaces;
 
-namespace SuperMember.Sample.Areas.Admin.Services
+namespace SuperMember.Sample.Code.Services
 {
-    public class SendGridIdentityEmailService : IIdentityMessageService
+    public class SendGridIdentityEmailService : IEmailIdentityService
     {
         public Task SendAsync(IdentityMessage message)
         {

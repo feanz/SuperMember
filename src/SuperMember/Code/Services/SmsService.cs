@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
+using SuperMember.Sample.Code.Interfaces;
 
-namespace SuperMember.Sample.Areas.Admin.Services
+namespace SuperMember.Sample.Code.Services
 {
-    public class SmsService : IIdentityMessageService
+    public class SmsService : ISmsIdentityService
     {
         public Task SendAsync(IdentityMessage message)
         {

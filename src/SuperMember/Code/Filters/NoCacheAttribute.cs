@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.Http.Filters;
 
-namespace SuperMember.Sample.Filters
+namespace SuperMember.Sample.Code.Filters
 {
     public class NoCacheAttribute : ActionFilterAttribute
     {

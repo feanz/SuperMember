@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 
-namespace SuperMember.Sample.Areas.Admin.Domain
+namespace SuperMember.Sample.Code.Domain
 {
     public class User : IdentityUser
     {
@@ -14,5 +14,7 @@ namespace SuperMember.Sample.Areas.Admin.Domain
             // Add custom user claims here
             return userIdentity;
         }
+
+        public string Name { get; set; }
     }
 }

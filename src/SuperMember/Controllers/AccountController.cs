@@ -10,8 +10,8 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Owin;
-using SuperMember.Sample.Areas.Admin.Domain;
-using SuperMember.Sample.Areas.Admin.Services;
+using SuperMember.Sample.Code.Domain;
+using SuperMember.Sample.Code.Services;
 using SuperMember.Sample.ViewModels.Account;
 
 namespace SuperMember.Sample.Controllers
@@ -19,27 +19,12 @@ namespace SuperMember.Sample.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        private UserService _userService;
-
-        public AccountController()
-        {
-        }
-
         public AccountController(UserService userService)
         {
             UserService = userService;
         }
 
-        public UserService UserService {
-            get
-            {
-                return _userService ?? HttpContext.GetOwinContext().GetUserManager<UserService>();
-            }
-            private set
-            {
-                _userService = value;
-            }
-        }
+        public UserService UserService { get; set; }
 
         //
         // GET: /Account/Login
@@ -92,19 +77,16 @@ namespace SuperMember.Sample.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new User() { UserName = model.Email, Email = model.Email };
+                var user = new User { UserName = model.Email, Email = model.Email, Name = model.Name };
+
                 IdentityResult result = await UserService.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInAsync(user, isPersistent: false);
+                    var code = await UserService.GenerateEmailConfirmationTokenAsync(user.Id);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    await UserService.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
-
-                    return RedirectToAction("Index", "Home");
+                    return View("EmailConfirmationRequired");
                 }
                 else
                 {
@@ -121,7 +103,7 @@ namespace SuperMember.Sample.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
         {
-            if (userId == null || code == null) 
+            if (userId == null || code == null)
             {
                 return View("Error");
             }
@@ -180,13 +162,13 @@ namespace SuperMember.Sample.Controllers
         {
             return View();
         }
-	
+
         //
         // GET: /Account/ResetPassword
         [AllowAnonymous]
-        public ActionResult ResetPassword(string code)
+        public ActionResult ResetPassword(string userid, string code)
         {
-            if (code == null) 
+            if (code == null)
             {
                 return View("Error");
             }
@@ -202,7 +184,7 @@ namespace SuperMember.Sample.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserService.FindByNameAsync(model.Email);
+                var user = await UserService.FindByIdAsync(model.UserId);
                 if (user == null)
                 {
                     ModelState.AddModelError("", "No user found.");
@@ -414,12 +396,12 @@ namespace SuperMember.Sample.Controllers
                     if (result.Succeeded)
                     {
                         await SignInAsync(user, isPersistent: false);
-                        
+
                         // Send an email with this link
                         var code = await UserService.GenerateEmailConfirmationTokenAsync(user.Id);
                         var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                        SendEmail(user.Email, callbackUrl, "Confirm your account", "Please confirm your account by clicking this link");
-                        
+                        await UserService.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+
                         return RedirectToLocal(returnUrl);
                     }
                 }
@@ -481,7 +463,9 @@ namespace SuperMember.Sample.Controllers
         private async Task SignInAsync(User user, bool isPersistent)
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-            AuthenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, await user.GenerateUserIdentityAsync(UserService));
+            var claimsIdentity = await user.GenerateUserIdentityAsync(UserService);
+            claimsIdentity.AddClaim(new Claim("Display Name", user.Name));
+            AuthenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, claimsIdentity);
         }
 
         private void AddErrors(IdentityResult result)
@@ -501,12 +485,7 @@ namespace SuperMember.Sample.Controllers
             }
             return false;
         }
-
-        private void SendEmail(string email, string callbackUrl, string subject, string message)
-        {
-            // For information on sending mail, please visit http://go.microsoft.com/fwlink/?LinkID=320771
-        }
-
+       
         public enum ManageMessageId
         {
             ChangePasswordSuccess,
@@ -529,7 +508,8 @@ namespace SuperMember.Sample.Controllers
 
         private class ChallengeResult : HttpUnauthorizedResult
         {
-            public ChallengeResult(string provider, string redirectUri) : this(provider, redirectUri, null)
+            public ChallengeResult(string provider, string redirectUri)
+                : this(provider, redirectUri, null)
             {
             }
 

@@ -1,24 +1,18 @@
-﻿using Microsoft.AspNet.Identity;
+﻿using System;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
-using System;
-using SuperMember.Sample.Areas.Admin.Domain;
-using SuperMember.Sample.Areas.Admin.Persistence;
-using SuperMember.Sample.Areas.Admin.Services;
-using SuperMember.Sample.ViewModels.Account;
+using SuperMember.Sample.Code.Domain;
+using SuperMember.Sample.Code.Services;
 
-namespace SuperMember.Sample
+namespace SuperMember.Sample.Code
 {
-    public partial class Startup
+    public class AuthConfig
     {
-        public void ConfigureAuth(IAppBuilder app)
+        public static void ConfigureAuth(IAppBuilder app)
         {
-            // Configure the db context and user manager to use a single instance per request
-            app.CreatePerOwinContext(ApplicationDbContext.Create);
-            app.CreatePerOwinContext<UserService>(UserService.Create);
-
             // Enable the application to use a cookie to store information for the signed in user
             // and to use a cookie to temporarily store information about a user logging in with a third party login provider
             // Configure the sign in cookie

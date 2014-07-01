@@ -46,6 +46,24 @@
     <Reference Include="SendGridMail">
       <HintPath>..\packages\Sendgrid.4.0.0\lib\SendGridMail.dll</HintPath>
     </Reference>
+    <Reference Include="SimpleInjector">
+      <HintPath>..\packages\SimpleInjector.2.5.0\lib\net45\SimpleInjector.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleInjector.Diagnostics">
+      <HintPath>..\packages\SimpleInjector.2.5.0\lib\net45\SimpleInjector.Diagnostics.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleInjector.Extensions.ExecutionContextScoping">
+      <HintPath>..\packages\SimpleInjector.Extensions.ExecutionContextScoping.2.5.0\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleInjector.Integration.Web">
+      <HintPath>..\packages\SimpleInjector.Integration.Web.2.5.0\lib\net40\SimpleInjector.Integration.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleInjector.Integration.Web.Mvc">
+      <HintPath>..\packages\SimpleInjector.Integration.Web.Mvc.2.5.0\lib\net40\SimpleInjector.Integration.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleInjector.Integration.WebApi">
+      <HintPath>..\packages\SimpleInjector.Integration.WebApi.2.5.0\lib\net45\SimpleInjector.Integration.WebApi.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -174,21 +192,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Start\BundleConfig.cs" />
-    <Compile Include="App_Start\FilterConfig.cs" />
-    <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="App_Start\Startup.Auth.cs" />
-    <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Code\CompositionRoot\BundleConfig.cs" />
+    <Compile Include="Code\CompositionRoot\FilterConfig.cs" />
+    <Compile Include="Code\CompositionRoot\IocConfig.cs" />
+    <Compile Include="Code\CompositionRoot\RouteConfig.cs" />
+    <Compile Include="Code\CompositionRoot\AuthConfig.cs" />
+    <Compile Include="Code\CompositionRoot\WebApiConfig.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\UserController.cs" />
-    <Compile Include="Areas\Admin\Domain\User.cs" />
-    <Compile Include="Areas\Admin\Persistence\ApplicationDbContext.cs" />
-    <Compile Include="Areas\Admin\Services\SendGridIdentityEmailService.cs" />
-    <Compile Include="Areas\Admin\Services\SmsService.cs" />
-    <Compile Include="Areas\Admin\Services\UserService.cs" />
+    <Compile Include="Code\Domain\User.cs" />
+    <Compile Include="Code\Extensions\UserExtentions.cs" />
+    <Compile Include="Code\Persistence\ApplicationDbContext.cs" />
+    <Compile Include="Code\Interfaces\IEmailIdentityService.cs" />
+    <Compile Include="Code\Interfaces\ISmsIdentityService.cs" />
+    <Compile Include="Code\Interfaces\IUserServiceFactory.cs" />
+    <Compile Include="Code\Services\SendGridIdentityEmailService.cs" />
+    <Compile Include="Code\Services\SmsService.cs" />
+    <Compile Include="Code\Services\UserService.cs" />
+    <Compile Include="Code\CompositionRoot\UserServiceFactory.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Filters\NoCacheAttribute.cs" />
+    <Compile Include="Code\Filters\NoCacheAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -254,6 +278,7 @@
     <Content Include="Views\Account\ResetPassword.cshtml" />
     <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Account\EmailConfirmationRequired.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

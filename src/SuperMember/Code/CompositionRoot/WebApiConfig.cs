@@ -1,6 +1,6 @@
 ﻿using System.Web.Http;
 
-namespace SuperMember.Sample
+namespace SuperMember.Sample.Code
 {
     public class WebApiConfig
     {
